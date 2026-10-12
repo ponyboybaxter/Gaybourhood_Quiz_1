@@ -3,31 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Trivia Quiz</title>
+    <title>The Gaybourhood Quiz</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 450px; box-sizing: border-box; text-align: center; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: #121212; 
+            color: #ffffff;
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .logo-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .logo-container img {
+            max-width: 180px;
+            height: auto;
+            border-radius: 8px;
+        }
+        .card { 
+            background: #1e1e1e; 
+            padding: 30px; 
+            border-radius: 16px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4); 
+            width: 100%; 
+            max-width: 450px; 
+            box-sizing: border-box; 
+            text-align: center; 
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #2d2d2d;
+        }
+        /* Rainbow Branding Accent Line */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 6px;
+            background: linear-gradient(90deg, #ff007f, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #7f00ff);
+        }
         .hidden { display: none; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        button { background-color: #007aff; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; }
-        button:hover { background-color: #0056b3; }
-        .option-btn { background-color: #e9ecef; color: #333; text-align: left; margin: 8px 0; }
-        .option-btn:hover { background-color: #dee2e6; }
+        input { 
+            width: 100%; padding: 14px; margin: 12px 0; 
+            border: 1px solid #333; border-radius: 8px; 
+            box-sizing: border-box; font-size: 16px; 
+            background: #2a2a2a; color: white;
+        }
+        input:focus { border-color: #ff007f; outline: none; }
+        button { 
+            background: linear-gradient(135deg, #ff007f, #7f00ff); 
+            color: white; border: none; padding: 14px 20px; 
+            font-size: 16px; font-weight: bold; border-radius: 8px; 
+            cursor: pointer; width: 100%; margin-top: 12px; 
+        }
+        button:hover { opacity: 0.9; }
+        .option-btn { background: #2a2a2a; color: #fff; text-align: left; margin: 10px 0; border: 1px solid #3c3c3c;}
+        .option-btn:hover { background: #3a3a3a; border-color: #ff007f; }
+        
+        /* Timer Bar UI */
+        .timer-container { width: 100%; background-color: #333; height: 6px; border-radius: 3px; margin: 15px 0; overflow: hidden; }
+        .timer-bar { height: 100%; background: #ff007f; width: 100%; transition: width 1s linear; }
+        
         ol { padding-left: 0; list-style: none; text-align: left; }
-        li { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
-    </style>
+        li { padding: 12px; border-bottom: 1px solid #2d2d2d; display: flex; justify-content: space-between; align-items: center; }
+        .rank { font-weight: bold; color: #ff007f; margin-right: 8px; }
+    </script>
 </head>
 <body>
 
+    <div class="logo-container">
+        <!-- REPLACE THE URL BELOW WITH YOUR ACTUAL LOGO IMAGE URL LATER -->
+        <img src="3A1E49B9-38B7-4887-AF88-45CC49875B8D.png" id="logo" alt="The Gaybourhood Logo">
+    </div>
+
     <div class="card" id="setup-screen">
-        <h2>Welcome to the Quiz</h2>
+        <h2 style="margin-top:10px;">The Gaybourhood Quiz 🏆</h2>
+        <p style="color:#aaa; font-size:14px;">Enter details to unlock the leaderboard</p>
         <input type="text" id="username" placeholder="Enter Your Name" required>
         <input type="number" id="userphone" placeholder="Last 3 Digits of Phone" pattern="[0-9]{3}" required>
         <button onclick="startQuiz()">Start Quiz</button>
     </div>
 
     <div class="card hidden" id="quiz-screen">
-        <h3 id="question-text">Question Loading...</h3>
+        <div class="timer-container"><div class="timer-bar" id="timer-bar"></div></div>
+        <h3 id="question-text" style="margin-bottom:20px;">Question Loading...</h3>
         <div id="options-container"></div>
     </div>
 
@@ -38,21 +101,39 @@
     </div>
 
     <script>
-        // PASTE YOUR GOOGLE WEB APP URL FROM STAGE 1 BETWEEN THE QUOTES BELOW:
+        // CRITICAL: PASTE YOUR GOOGLE WEB APP URL FROM STAGE 1 BETWEEN THE QUOTES BELOW
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5piLQn4H9x9jUoTJJyIBbmt-bePL4lXhBLU95qscl1VLKTj_91Oh0baFGXUbxST6gzQ/exec";
 
-        // Sample Questions array. You can copy/paste these objects to make it 20 questions!
+        // EDIT YOUR 20 QUESTIONS AND ANSWER CHOICES DIRECTLY IN THIS ARRAY BELOW:
+        // 'correct' is the index number of the right choice (0 = first answer, 1 = second, etc.)
         const quizData = [
-            { q: "What is the capital of France?", a: ["Paris", "London", "Berlin", "Madrid"], correct: 0 },
-            { q: "Which planet is known as the Red Planet?", a: ["Earth", "Mars", "Jupiter", "Venus"], correct: 1 },
-            { q: "What is 5 + 7?", a: ["10", "11", "12", "13"], correct: 2 },
-            { q: "Who wrote 'Romeo and Juliet'?", a: ["William Shakespeare", "Charles Dickens", "Mark Twain", "Jane Austen"], correct: 0 },
-            { q: "What is the largest ocean on Earth?", a: ["Atlantic", "Indian", "Arctic", "Pacific"], correct: 3 }
+            { q: "Which artist released the 1994 album ‘Dummy’?", a: ["Portishead", "Massive Attack", "Tricky", "Morcheeba"], correct: 0 },
+            { q: "Which was David Bowie’s final studio album released during his lifetime?", a: ["The Next Day", "Blackstar", "Heathen", "Reality"], correct: 1 },
+            { q: "Which band released the album Mezzanine?", a: ["Portishead", "UNKLE", "Massive Attack", "Faithless"], correct: 2 },
+            { q: "Who originally recorded ‘Tainted Love’ before Soft Cell made it a huge hit?", a: ["Sandie Shaw", "Gloria Jones", "Dusty Springfield", "P.P. Arnold"], correct: 1 },
+            { q: "Which Fleetwood Mac album features the song ‘The Chain’?", a: ["Rumours", "Tusk", "Fleetwood Mac (1975)", "Mirage"], correct: 0 },
+            { q: "Who sang the original version of ‘Nothing Compares 2 U’, written by Prince?", a: ["Sinéad O’Connor", "The Family", "Wendy & Lisa", "Chaka Khan"], correct: 1 },
+            { q: "What was the first studio album released by The Cure?", a: ["Seventeen Seconds", "Faith", "Three Imaginary Boys", "Boys Don’t Cry"], correct: 2 },
+            { q: "Which singer performed ’Unfinished Symphony’ with Massive Attack?", a: ["Neneh Cherry", "Shara Nelson", "Tracey Thorn", "Carleen Anderson"], correct: 1 },
+            { q: "Which Beatles album was released first?", a: ["Rubber Soul", "Revolver", "Help!", "Sgt. Pepper’s Lonely Hearts Club Band"], correct: 2 },
+            { q: "Who wrote and originally recorded ‘I Will Always Love You?", a: ["Dolly Parton", "Patsy Cline", "Tammy Wynette", "Loretta Lynn"], correct: 0 },
+            { q: "Which songwriter behind Britney Spears’ ‘Toxic’ recently revealed that the track was just one of around 15 ideas he had that day?", a: ["Max Martin", "Christian Karlsson", "Bloodshy", "Dr. Luke"], correct: 1 },
+            { q: "In which Taylor Swift song does she refer to a scarf left at someone’s sister’s house?", a: ["All Too Well", "Cardigan", "The Last Great American Dynasty", "Dear John"], correct: 0 },
+            { q: "Which pop star condemned the White House in 2026 after one of her songs was used in a social media video without her approval?", a: ["Zara Larsson", "Charli XCX", "Olivia Rodrigo", "Chappell Roan"], correct: 0 },
+            { q: "Which artists song ‘Fast Car’ tells the story of a narrator hoping to escape poverty with a partner?", a: ["Suzanne Vega", "Tracy Chapman", "Cheryl Crow", "Joan Osborne"], correct: 1 },
+            { q: "Which artist released the 2026 album PRIMA, featuring the singles ‘Ain’t in LA’ and ‘Nicole Kidman’?", a: ["Choice A", "Choice B", "Choice C", "Choice D"], correct: 0 },
+            { q: "in Wueen’s ‘Bohemian Rhapsody’, which character does the narrator say he has killed?", a: ["Marco", "Galileo", "Figaro", "A man who’s name is never given"], correct: 3 },
+            { q: "Which artist released ‘Accelerando’ in 2026 as the lead single from the upcoming AI-Inspired album Psy Opera?", a: ["Grimes", "FKA Twigs", "Arca", "Caroline Polachek"], correct: 0 },
+            { q: "Which singer recorded the demo of ‘Can’t Get You Out of My Head’ before Kylie Minogue took it to number one?", a: ["Sophie Ellis-Bextor", "Cathy Dennis", "Dannii Minogue", "Rachel Stevens"], correct: 1 },
+            { q: "Which artist released the album The Idler Wheel…, featuring the track ‘Every Single Night’, in 2012?", a: ["Tori Amos", "Regina Spektor", "Fiona Apple", "Cat Power"], correct: 2 },
+            { q: "Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?", a: ["PJ Harvey", "Beth Orton", "Tori Amos", "Björk"], correct: 3 }
         ];
 
         let currentQuestionIndex = 0;
         let score = 0;
         let userData = { name: "", phone: "" };
+        let timerInterval;
+        let timeLeft = 10;
 
         function startQuiz() {
             userData.name = document.getElementById('username').value.trim();
@@ -69,8 +150,12 @@
         }
 
         function loadQuestion() {
+            clearInterval(timerInterval);
+            timeLeft = 10;
+            updateTimerBar();
+
             const currentQuestion = quizData[currentQuestionIndex];
-            document.getElementById('question-text').innerText = `Question ${currentQuestionIndex + 1}: ${currentQuestion.q}`;
+            document.getElementById('question-text').innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}: ${currentQuestion.q}`;
             
             const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = "";
@@ -82,9 +167,25 @@
                 btn.onclick = () => handleAnswer(index);
                 optionsContainer.appendChild(btn);
             });
+
+            // Start countdown loop
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerBar();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleAnswer(-1); // -1 simulates a wrong answer due to running out of time
+                }
+            }, 1000);
+        }
+
+        function updateTimerBar() {
+            const percentage = (timeLeft / 10) * 100;
+            document.getElementById('timer-bar').style.width = `${percentage}%`;
         }
 
         function handleAnswer(selectedIndex) {
+            clearInterval(timerInterval);
             if (selectedIndex === quizData[currentQuestionIndex].correct) {
                 score++;
             }
@@ -101,49 +202,11 @@
             document.getElementById('quiz-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.remove('hidden');
 
-            const payload = {
-                name: userData.name,
-                phone: userData.phone,
-                score: score
-            };
+            const payload = { name: userData.name, phone: userData.phone, score: score };
 
-            // Send score to Google Sheet
             fetch(SCRIPT_URL, {
                 method: "POST",
                 mode: "no-cors",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
-            .then(() => {
-                // Wait 1.5 seconds for Google to process, then pull down leaderboard data
-                setTimeout(fetchLeaderboard, 1500);
-            })
-            .catch(err => {
-                console.error("Error submitting score:", err);
-                fetchLeaderboard();
-            });
-        }
-
-        function fetchLeaderboard() {
-            fetch(SCRIPT_URL)
-            .then(res => res.json())
-            .then(data => {
-                const list = document.getElementById('leaderboard-list');
-                list.innerHTML = "";
-                if(data.length === 0) {
-                    list.innerHTML = "<li>No scores recorded yet!</li>";
-                    return;
-                }
-                data.forEach((player, index) => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `<span>${index + 1}. ${player.name} (${player.phone})</span> <strong>${player.score} pts</strong>`;
-                    list.appendChild(li);
-                });
-            })
-            .catch(err => {
-                document.getElementById('leaderboard-list').innerHTML = "<li>Error loading leaderboard.</li>";
-            });
-        }
-    </script>
-</body>
-</html>
