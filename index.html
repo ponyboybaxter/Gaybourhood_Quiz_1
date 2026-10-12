@@ -75,7 +75,7 @@
 </head>
 <body>
 
-      <div class="logo-container">
+    <div class="logo-container">
         <img src="3A1E49B9-38B7-4887-AF88-45CC49875B8D.png" id="logo" alt="The Gaybourhood Logo">
     </div>
 
@@ -100,11 +100,8 @@
     </div>
 
     <script>
-        // CRITICAL: PASTE YOUR GOOGLE WEB APP URL FROM STAGE 1 BETWEEN THE QUOTES BELOW
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5piLQn4H9x9jUoTJJyIBbmt-bePL4lXhBLU95qscl1VLKTj_91Oh0baFGXUbxST6gzQ/exec";
 
-        // EDIT YOUR 20 QUESTIONS AND ANSWER CHOICES DIRECTLY IN THIS ARRAY BELOW:
-        // 'correct' is the index number of the right choice (0 = first answer, 1 = second, etc.)
         const quizData = [
             { q: "Which artist released the 1994 album ‘Dummy’?", a: ["Portishead", "Massive Attack", "Tricky", "Morcheeba"], correct: 0 },
             { q: "Which was David Bowie’s final studio album released during his lifetime?", a: ["The Next Day", "Blackstar", "Heathen", "Reality"], correct: 1 },
@@ -120,12 +117,12 @@
             { q: "In which Taylor Swift song does she refer to a scarf left at someone’s sister’s house?", a: ["All Too Well", "Cardigan", "The Last Great American Dynasty", "Dear John"], correct: 0 },
             { q: "Which pop star condemned the White House in 2026 after one of her songs was used in a social media video without her approval?", a: ["Zara Larsson", "Charli XCX", "Olivia Rodrigo", "Chappell Roan"], correct: 0 },
             { q: "Which artists song ‘Fast Car’ tells the story of a narrator hoping to escape poverty with a partner?", a: ["Suzanne Vega", "Tracy Chapman", "Cheryl Crow", "Joan Osborne"], correct: 1 },
-            { q: "Which artist released the 2026 album PRIMA, featuring the singles ‘Ain’t in LA’ and ‘Nicole Kidman’?", a: ["Choice A", "Choice B", "Choice C", "Choice D"], correct: 0 },
-            { q: "in Wueen’s ‘Bohemian Rhapsody’, which character does the narrator say he has killed?", a: ["Marco", "Galileo", "Figaro", "A man who’s name is never given"], correct: 3 },
+            { q: "Which artist released the 2026 album PRIMA, featuring the singles ‘Ain’t in LA’ and ‘Nicole Kidman’?", a: ["The Dare", "Charli XCX", "Chappell Roan", "Troye Sivan"], correct: 0 },
+            { q: "In Queen’s ‘Bohemian Rhapsody’, which character does the narrator say he has killed?", a: ["Marco", "Galileo", "Figaro", "A man whose name is never given"], correct: 3 },
             { q: "Which artist released ‘Accelerando’ in 2026 as the lead single from the upcoming AI-Inspired album Psy Opera?", a: ["Grimes", "FKA Twigs", "Arca", "Caroline Polachek"], correct: 0 },
             { q: "Which singer recorded the demo of ‘Can’t Get You Out of My Head’ before Kylie Minogue took it to number one?", a: ["Sophie Ellis-Bextor", "Cathy Dennis", "Dannii Minogue", "Rachel Stevens"], correct: 1 },
             { q: "Which artist released the album The Idler Wheel…, featuring the track ‘Every Single Night’, in 2012?", a: ["Tori Amos", "Regina Spektor", "Fiona Apple", "Cat Power"], correct: 2 },
-            { q: "Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?", a: ["PJ Harvey", "Beth Orton", "Tori Amos", "Björk"], correct: 3 }
+            { q: "Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?", a: ["PJ Harvey", "Björk", "Alanis Morissette", "Fiona Apple"], correct: 1 }
         ];
 
         let currentQuestionIndex = 0;
@@ -167,13 +164,12 @@
                 optionsContainer.appendChild(btn);
             });
 
-            // Start countdown loop
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimerBar();
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    handleAnswer(-1); // -1 simulates a wrong answer due to running out of time
+                    handleAnswer(-1);
                 }
             }, 1000);
         }
@@ -182,30 +178,3 @@
             const percentage = (timeLeft / 10) * 100;
             document.getElementById('timer-bar').style.width = `${percentage}%`;
         }
-
-        function handleAnswer(selectedIndex) {
-            clearInterval(timerInterval);
-            if (selectedIndex === quizData[currentQuestionIndex].correct) {
-                score++;
-            }
-
-            currentQuestionIndex++;
-            if (currentQuestionIndex < quizData.length) {
-                loadQuestion();
-            } else {
-                submitData();
-            }
-        }
-
-        function submitData() {
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('leaderboard-screen').classList.remove('hidden');
-
-            const payload = { name: userData.name, phone: userData.phone, score: score };
-
-            fetch(SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            })
