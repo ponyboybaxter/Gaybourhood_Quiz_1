@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>The Gaybourhood Quiz</title>
 <style>
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:radial-gradient(circle at center, #23123a 0%, #0a0512 100%);color:#ffffff;margin:0;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh}
-.logo-container{margin-bottom:20px;text-align:center;width:100%;max-width:450px;box-sizing:border-box}.logo-container img{width:100%;height:auto;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.logo-container{margin-bottom:20px;text-align:center;width:450px;max-width:100%;box-sizing:border-box}.logo-container img{width:100%;height:auto;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:block}
 .card{background:#1e1e1e;padding:30px;border-radius:16px;box-shadow:0 0 60px rgba(127, 0, 255, 0.2), 0 8px 32px rgba(0,0,0,0.6);width:100%;max-width:450px;box-sizing:border-box;text-align:center;position:relative;overflow:hidden;border:1px solid #2d2d2d}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#ff007f,#ff0000,#ff7f00,#ffff00,#00ff00,#0000ff,#7f00ff)}
 .hidden{display:none !important}
@@ -28,8 +28,8 @@ li{padding:12px;border-bottom:1px solid #2d2d2d;display:flex;justify-content:spa
 <div id="options-container"></div>
 </div>
 <div id="leaderboard-screen" class="card hidden">
-<h2>Leaderboard 🏆</h2><ol id="leaderboard-list">Loading standings...</ol>
-<button class="action-btn" id="reload-btn">Play Again</button>
+<h2 id="leaderboard-title">Leaderboard 🏆</h2><ol id="leaderboard-list">Loading standings...</ol>
+<button class="action-btn id="reload-btn"" onclick="location.reload()">Refresh Standings</button>
 </div>
 <script>
 const SCRIPT_URL = "https://google.com";
@@ -42,7 +42,7 @@ const quizData = [
 {q:"Who sang the original version of ‘Nothing Comares 2 U’, written by Prince?",a:["Sinéad O’Connor","The Family","Wendy & Lisa","Chaka Khan"],correct:1},
 {q:"What was the first studio album released by The Cure?",a:["Seventeen Seconds","Faith","Three Imaginary Boys","Boys Don’t Cry"],correct:2},
 {q:"Which singer performed ’Unfinished Symphony’ with Massive Attack?",a:["Neneh Cherry","Shara Nelson","Tracey Thorn","Carleen Anderson"],correct:1},
-{q:"Which Beatles album was released first?",a:["Rubber Soul","Revolver","Help!","Sgt. Pepper’s Lonely Hearts Club Band"],correct:2},
+{q:"Which Beatles album was released first?",a:["Rubber Soul","Revolver","Help!","Sgt. Pepper’s Lonely Heights Club Band"],correct:2},
 {q:"Who wrote and originally recorded ‘I Will Always Love You?",a:["Dolly Parton","Patsy Cline","Tammy Wynette","Loretta Lynn"],correct:0},
 {q:"Which songwriter behind Britney Spears’ ‘Toxic’ recently revealed that the track was just one of around 15 ideas he had that day?",a:["Max Martin","Christian Karlsson","Bloodshy","Dr. Luke"],correct:1},
 {q:"In which Taylor Swift song does she refer to a scarf left at someone’s sister’s house?",a:["All Too Well","Cardigan","The Last Great American Dynasty","Dear John"],correct:0},
@@ -56,12 +56,22 @@ const quizData = [
 {q:"Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?",a:["PJ Harvey","Björk","Alanis Morissette","Fiona Apple"],correct:1}
 ];
 let idx=0,score=0,uName="",uPhone="",tInt=null,tLeft=15;
+
+// Checks if they have already played before allowing them into the signup screen
+window.onload = function() {
+    if (localStorage.getItem("gaybourhood_quiz_played")) {
+        document.getElementById("setup-screen").className = "card hidden";
+        document.getElementById("leaderboard-screen").className = "card";
+        document.getElementById("leaderboard-title").innerText = "You've Already Played! 🏆";
+        getL();
+    }
+};
+
 document.getElementById("start-btn").onclick=function(){
 uName=document.getElementById("username").value.trim();uPhone=document.getElementById("userphone").value.trim();
 if(uName===""||uPhone===""){alert("Fields cannot be empty.");return}
 document.getElementById("setup-screen").className="card hidden";document.getElementById("quiz-screen").className="card";showQ();
 };
-document.getElementById("reload-btn").onclick=function(){location.reload()};
 function showQ(){
 clearInterval(tInt);tLeft=15;document.getElementById("timer-bar").style.width="100%";
 const curr=quizData[idx];document.getElementById("question-text").innerText="Question "+(idx+1)+" of "+quizData.length+": "+curr.q;
@@ -73,6 +83,8 @@ tInt=setInterval(function(){tLeft--;document.getElementById("timer-bar").style.w
 }
 function nxt(sel){clearInterval(tInt);if(sel===quizData[idx].correct){score++}idx++;if(idx<quizData.length){showQ()}else{send()}}
 function send(){
+// Lock their browser immediately at the end of question 20 so they cannot try again
+localStorage.setItem("gaybourhood_quiz_played", "true");
 document.getElementById("quiz-screen").className="card hidden";document.getElementById("leaderboard-screen").className="card";
 fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:uName,phone:uPhone,score:score})})
 .then(function(){setTimeout(getL,1500)}).catch(function(){getL()});
