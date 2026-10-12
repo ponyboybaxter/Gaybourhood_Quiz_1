@@ -1,54 +1,86 @@
-function doGet() {
-  // 1. CHOOSE YOUR 20 QUESTIONS AND ANSWER OPTIONS HERE:
-  // 'correct' is the index number of the right choice (0 = first answer, 1 = second, etc.)
-  var quizData = [
-    {q:"Which artist released the 1994 album ‘Dummy’?",a:["Portishead","Massive Attack","Tricky","Morcheeba"],correct:0},
-    {q:"Which was David Bowie’s final studio album released during his lifetime?",a:["The Next Day","Blackstar","Heathen","Reality"],correct:1},
-    {q:"Which band released the album Mezzanine?",a:["Portishead","UNKLE","Massive Attack","Faithless"],correct:2},
-    {q:"Who originally recorded ‘Tainted Love’ before Soft Cell made it a huge hit?",a:["Sandie Shaw","Gloria Jones","Dusty Springfield","P.P. Arnold"],correct:1},
-    {q:"Which Fleetwood Mac album features the song ‘The Chain’?",a:["Rumours","Tusk","Fleetwood Mac (1975)","Mirage"],correct:0},
-    {q:"Who sang the original version of ‘Nothing Comares 2 U’, written by Prince?",a:["Sinéad O’Connor","The Family","Wendy & Lisa","Chaka Khan"],correct:1},
-    {q:"What was the first studio album released by The Cure?",a:["Seventeen Seconds","Faith","Three Imaginary Boys","Boys Don’t Cry"],correct:2},
-    {q:"Which singer performed ’Unfinished Symphony’ with Massive Attack?",a:["Neneh Cherry","Shara Nelson","Tracey Thorn","Carleen Anderson"],correct:1},
-    {q:"Which Beatles album was released first?",a:["Rubber Soul","Revolver","Help!","Sgt. Pepper’s Lonely Hearts Club Band"],correct:2},
-    {q:"Who wrote and originally recorded ‘I Will Always Love You?",a:["Dolly Parton","Patsy Cline","Tammy Wynette","Loretta Lynn"],correct:0},
-    {q:"Which songwriter behind Britney Spears’ ‘Toxic’ recently revealed that the track was just one of around 15 ideas he had that day?",a:["Max Martin","Christian Karlsson","Bloodshy","Dr. Luke"],correct:1},
-    {q:"In which Taylor Swift song does she refer to a scarf left at someone’s sister’s house?", a:["All Too Well","Cardigan","The Last Great American Dynasty","Dear John"],correct:0},
-    {q:"Which pop star condemned the White House in 2026 after one of her songs was used in a social media video without her approval?",a:["Zara Larsson","Charli XCX","Olivia Rodrigo","Chappell Roan"],correct:0},
-    {q:"Which artists song ‘Fast Car’ tells the story of a narrator hoping to escape poverty with a partner?",a:["Suzanne Vega","Tracy Chapman","Cheryl Crow","Joan Osborne"],correct:1},
-    {q:"Which artist released the 2026 album PRIMA, featuring the singles ‘Ain’t in LA’ and ‘Nicole Kidman’?",a:["Tate McRae","ADÉLA","Addison Rae","Zara Larsson"],correct:1},
-    {q:"In Queen’s ‘Bohemian Rhapsody’, which character does the narrator say he has killed?",a:["Marco","Galileo","Figaro","A man whose name is never given"],correct:3},
-    {q:"Which artist released ‘Accelerando’ in 2026 as the lead single from the upcoming AI-Inspired album Psy Opera?",a:["Grimes","FKA Twigs","Arca","Caroline Polachek"],correct:0},
-    {q:"Which singer recorded the demo of ‘Can’t Get You Out of My Head’ before Kylie Minogue took it to number one?",a:["Sophie Ellis-Bextor","Cathy Dennis","Dannii Minogue","Rachel Stevens"],correct:1},
-    {q:"Which artist released the album The Idler Wheel…, featuring the track ‘Every Single Night’, in 2012?",a:["Tori Amos","Regina Spektor","Fiona Apple","Cat Power"],correct:2},
-    {q:"Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?",a:["PJ Harvey","Björk","Alanis Morissette","Fiona Apple"],correct:1}
-  ];
-
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  var leaderboard = [];
-  
-  for (var i = 1; i < data.length; i++) {
-    var row = data[i];
-    if (row[1] && row[3] !== undefined) {
-      leaderboard.push({ name: row[1].toString(), phone: row[2].toString(), score: parseInt(row[3]) || 0 });
-    }
-  }
-  
-  leaderboard.sort(function(a,b){ return b.score - a.score; });
-  
-  var responseData = { questions: quizData, players: leaderboard.slice(0, 10) };
-  return ContentService.createTextOutput(JSON.stringify(responseData)).setMimeType(ContentService.MimeType.JSON);
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>The Gaybourhood Quiz</title>
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background-color:#121212;color:#ffffff;margin:0;padding:20px;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:100vh}
+.logo-container{margin-bottom:20px;text-align:center}.logo-container img{max-width:180px;height:auto;border-radius:8px}
+.card{background:#1e1e1e;padding:30px;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.4);width:100%;max-width:450px;box-sizing:border-box;text-align:center;position:relative;overflow:hidden;border:1px solid #2d2d2d}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#ff007f,#ff0000,#ff7f00,#ffff00,#00ff00,#0000ff,#7f00ff)}
+.hidden{display:none !important}
+input{width:100%;padding:14px;margin:12px 0;border:1px solid #333;border-radius:8px;box-sizing:border-box;font-size:16px;background:#2a2a2a;color:white}
+.action-btn{display:block;background:linear-gradient(135deg,#ff007f,#7f00ff);color:white;text-decoration:none;padding:14px 20px;font-size:16px;font-weight:bold;border-radius:8px;cursor:pointer;margin-top:12px;text-align:center;border:none;width:100%;box-sizing:border-box}
+.option-btn{background:#2a2a2a;color:#fff;text-align:left;margin:10px 0;border:1px solid #3c3c3c;width:100%;padding:14px;font-size:16px;border-radius:8px;cursor:pointer;display:block;box-sizing:border-box}
+.option-btn:hover {background:#3a3a3a;border-color:#ff007f}
+.timer-container{width:100%;background-color:#333;height:6px;border-radius:3px;margin:15px 0;overflow:hidden}
+.timer-bar{height:100%;background:#ff007f;width:100%;transition:width 1s linear}
+ol{padding-left:0;list-style:none;text-align:left}
+li{padding:12px;border-bottom:1px solid #2d2d2d;display:flex;justify-content:space-between;align-items:center}
+.rank{font-weight:bold;color:#ff007f;margin-right:8px}
+</style></head><body>
+<div class="logo-container"><img src="3A1E49B9-38B7-4887-AF88-45CC49875B8D.png" id="logo" alt="The Gaybourhood Logo"></div>
+<div id="setup-screen" class="card">
+<h2 style="margin-top:10px">The Gaybourhood Quiz 🏆</h2>
+<input type="text" id="username" placeholder="Enter Your Name">
+<input type="text" id="userphone" placeholder="Last 3 Digits of Phone">
+<button class="action-btn" id="start-btn">Start Quiz</button>
+</div>
+<div id="quiz-screen" class="card hidden">
+<div class="timer-container"><div class="timer-bar" id="timer-bar"></div></div>
+<h3 id="question-text" style="margin-bottom:20px">Loading...</h3>
+<div id="options-container"></div>
+</div>
+<div id="leaderboard-screen" class="card hidden">
+<h2>Leaderboard 🏆</h2><ol id="leaderboard-list">Loading standings...</ol>
+<button class="action-btn" id="reload-btn">Play Again</button>
+</div>
+<script>
+const SCRIPT_URL = "https://google.com";
+const quizData = [
+{q:"Which artist released the 1994 album ‘Dummy’?",a:["Portishead","Massive Attack","Tricky","Morcheeba"],correct:0},
+{q:"Which was David Bowie’s final studio album released during his lifetime?",a:["The Next Day","Blackstar","Heathen","Reality"],correct:1},
+{q:"Which band released the album Mezzanine?",a:["Portishead","UNKLE","Massive Attack","Faithless"],correct:2},
+{q:"Who originally recorded ‘Tainted Love’ before Soft Cell made it a huge hit?",a:["Sandie Shaw","Gloria Jones","Dusty Springfield","P.P. Arnold"],correct:1},
+{q:"Which Fleetwood Mac album features the song ‘The Chain’?",a:["Rumours","Tusk","Fleetwood Mac (1975)","Mirage"],correct:0},
+{q:"Who sang the original version of ‘Nothing Comares 2 U’, written by Prince?",a:["Sinéad O’Connor","The Family","Wendy & Lisa","Chaka Khan"],correct:1},
+{q:"What was the first studio album released by The Cure?",a:["Seventeen Seconds","Faith","Three Imaginary Boys","Boys Don’t Cry"],correct:2},
+{q:"Which singer performed ’Unfinished Symphony’ with Massive Attack?",a:["Neneh Cherry","Shara Nelson","Tracey Thorn","Carleen Anderson"],correct:1},
+{q:"Which Beatles album was released first?",a:["Rubber Soul","Revolver","Help!","Sgt. Pepper’s Lonely Hearts Club Band"], correct:2},
+{q:"Who wrote and originally recorded ‘I Will Always Love You?",a:["Dolly Parton","Patsy Cline","Tammy Wynette","Loretta Lynn"],correct:0},
+{q:"Which songwriter behind Britney Spears’ ‘Toxic’ recently revealed that the track was just one of around 15 ideas he had that day?",a:["Max Martin","Christian Karlsson","Bloodshy","Dr. Luke"],correct:1},
+{q:"In which Taylor Swift song does she refer to a scarf left at someone’s sister’s house?",a:["All Too Well","Cardigan","The Last Great American Dynasty","Dear John"],correct:0},
+{q:"Which pop star condemned the White House in 2026 after one of her songs was used in a social media video without her approval?",a:["Zara Larsson","Charli XCX","Olivia Rodrigo","Chappell Roan"],correct:0},
+{q:"Which artists song ‘Fast Car’ tells the story of a narrator hoping to escape poverty with a partner?",a:["Suzanne Vega","Tracy Chapman","Cheryl Crow","Joan Osborne"],correct:1},
+{q:"Which artist released the 2026 album PRIMA, featuring the singles ‘Ain’t in LA’ and ‘Nicole Kidman’?",a:[“Tate McRae","ADÉLA","Addison Rae","Zara Larsson"],correct:1},
+{q:"In Queen’s ‘Bohemian Rhapsody’, which character does the narrator say he has killed?",a:["Marco","Galileo","Figaro","A man whose name is never given"],correct:3},
+{q:"Which artist released ‘Accelerando’ in 2026 as the lead single from the upcoming AI-Inspired album Psy Opera?",a:["Grimes","FKA Twigs","Arca","Caroline Polachek"],correct:0},
+{q:"Which singer recorded the demo of ‘Can’t Get You Out of My Head’ before Kylie Minogue took it to number one?",a:["Sophie Ellis-Bextor","Cathy Dennis","Dannii Minogue","Rachel Stevens"],correct:1},
+{q:"Which artist released the album The Idler Wheel…, featuring the track ‘Every Single Night’, in 2012?",a:["Tori Amos","Regina Spektor","Fiona Apple","Cat Power"],correct:2},
+{q:"Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?",a:["PJ Harvey","Björk","Alanis Morissette","Fiona Apple"],correct:1}
+];
+let idx=0,score=0,uName="",uPhone="",tInt=null,tLeft=10;
+document.getElementById("start-btn").onclick=function(){
+uName=document.getElementById("username").value.trim();uPhone=document.getElementById("userphone").value.trim();
+if(uName===""||uPhone===""){alert("Fields cannot be empty.");return}
+document.getElementById("setup-screen").className="card hidden";document.getElementById("quiz-screen").className="card";showQ();
+};
+document.getElementById("reload-btn").onclick=function(){location.reload()};
+function showQ(){
+clearInterval(tInt);tLeft=10;document.getElementById("timer-bar").style.width="100%";
+const curr=quizData[idx];document.getElementById("question-text").innerText="Question "+(idx+1)+" of "+quizData.length+": "+curr.q;
+const box=document.getElementById("options-container");box.innerHTML="";
+curr.a.forEach(function(opt,i){
+const b=document.createElement("button");b.className="option-btn";b.innerText=opt;b.onclick=function(){nxt(i)};box.appendChild(b);
+});
+tInt=setInterval(function(){tLeft--;document.getElementById("timer-bar").style.width=((tLeft/10)*100)+"%";if(tLeft<=0){clearInterval(tInt);nxt(-1)}},1000);
 }
-
-function doPost(e) {
-  try {
-    var data = JSON.parse(e.postData.contents);
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    sheet.appendRow([new Date(), data.name, data.phone, parseInt(data.score)]);
-    return ContentService.createTextOutput(JSON.stringify({status:"success"})).setMimeType(ContentService.MimeType.JSON);
-  } catch(error) {
-    return ContentService.createTextOutput(JSON.stringify({status:"error",message:error.toString()})).setMimeType(ContentService.MimeType.JSON);
-  }
+function nxt(sel){clearInterval(tInt);if(sel===quizData[idx].correct){score++}idx++;if(idx<quizData.length){showQ()}else{send()}}
+function send(){
+document.getElementById("quiz-screen").className="card hidden";document.getElementById("leaderboard-screen").className="card";
+fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:uName,phone:uPhone,score:score})})
+.then(function(){setTimeout(getL,1500)}).catch(function(){getL()});
 }
-
+function getL(){
+fetch(SCRIPT_URL).then(function(r){return r.json()}).then(function(d){
+const l=document.getElementById("leaderboard-list");l.innerHTML="";if(d.length===0){l.innerHTML="<li>No scores yet!</li>";return}
+d.forEach(function(p,i){const item=document.createElement("li");item.innerHTML='<span><span class="rank">#'+(i+1)+'</span>'+p.name+' ('+p.phone+')</span><strong>'+p.score+'/'+quizData.length+'</strong>';l.appendChild(item)});
+}).catch(function(){document.getElementById("leaderboard-list").innerHTML="<li>Error loading leaderboard.</li>"});
+}
+</script></body></html>
