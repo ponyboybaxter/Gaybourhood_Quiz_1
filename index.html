@@ -32,7 +32,7 @@ li{padding:12px;border-bottom:1px solid #2d2d2d;display:flex;justify-content:spa
 <button class="action-btn" id="reload-btn">Play Again</button>
 </div>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxLnKJEI2VL5UFb_WQsxsFCQOG2OaE-Cmp5GWFGDdZdqonQmvFYI_TEhHfWM4LYXQdzGA/exec";
+const SCRIPT_URL = "https://google.com";
 const quizData = [
 {q:"Which artist released the 1994 album ‘Dummy’?",a:["Portishead","Massive Attack","Tricky","Morcheeba"],correct:0},
 {q:"Which was David Bowie’s final studio album released during his lifetime?",a:["The Next Day","Blackstar","Heathen","Reality"],correct:1},
@@ -42,20 +42,20 @@ const quizData = [
 {q:"Who sang the original version of ‘Nothing Comares 2 U’, written by Prince?",a:["Sinéad O’Connor","The Family","Wendy & Lisa","Chaka Khan"],correct:1},
 {q:"What was the first studio album released by The Cure?",a:["Seventeen Seconds","Faith","Three Imaginary Boys","Boys Don’t Cry"],correct:2},
 {q:"Which singer performed ’Unfinished Symphony’ with Massive Attack?",a:["Neneh Cherry","Shara Nelson","Tracey Thorn","Carleen Anderson"],correct:1},
-{q:"Which Beatles album was released first?",a:["Rubber Soul","Revolver","Help!","Sgt. Pepper’s Lonely Hearts Club Band"], correct:2},
+{q:"Which Beatles album was released first?",a:["Rubber Soul","Revolver","Help!","Sgt. Pepper’s Lonely Hearts Club Band"],correct:2},
 {q:"Who wrote and originally recorded ‘I Will Always Love You?",a:["Dolly Parton","Patsy Cline","Tammy Wynette","Loretta Lynn"],correct:0},
 {q:"Which songwriter behind Britney Spears’ ‘Toxic’ recently revealed that the track was just one of around 15 ideas he had that day?",a:["Max Martin","Christian Karlsson","Bloodshy","Dr. Luke"],correct:1},
 {q:"In which Taylor Swift song does she refer to a scarf left at someone’s sister’s house?",a:["All Too Well","Cardigan","The Last Great American Dynasty","Dear John"],correct:0},
 {q:"Which pop star condemned the White House in 2026 after one of her songs was used in a social media video without her approval?",a:["Zara Larsson","Charli XCX","Olivia Rodrigo","Chappell Roan"],correct:0},
 {q:"Which artists song ‘Fast Car’ tells the story of a narrator hoping to escape poverty with a partner?",a:["Suzanne Vega","Tracy Chapman","Cheryl Crow","Joan Osborne"],correct:1},
-{q:"Which artist released the 2026 album PRIMA, featuring the singles ‘Ain’t in LA’ and ‘Nicole Kidman’?",a:[“Tate McRae","ADÉLA","Addison Rae","Zara Larsson"],correct:1},
+{q:"Which artist released the 2026 album PRIMA, featuring the singles ‘Ain’t in LA’ and ‘Nicole Kidman’?",a:["Tate McRae","ADÉLA","Addison Rae","Zara Larsson"],correct:1},
 {q:"In Queen’s ‘Bohemian Rhapsody’, which character does the narrator say he has killed?",a:["Marco","Galileo","Figaro","A man whose name is never given"],correct:3},
 {q:"Which artist released ‘Accelerando’ in 2026 as the lead single from the upcoming AI-Inspired album Psy Opera?",a:["Grimes","FKA Twigs","Arca","Caroline Polachek"],correct:0},
 {q:"Which singer recorded the demo of ‘Can’t Get You Out of My Head’ before Kylie Minogue took it to number one?",a:["Sophie Ellis-Bextor","Cathy Dennis","Dannii Minogue","Rachel Stevens"],correct:1},
 {q:"Which artist released the album The Idler Wheel…, featuring the track ‘Every Single Night’, in 2012?",a:["Tori Amos","Regina Spektor","Fiona Apple","Cat Power"],correct:2},
 {q:"Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?",a:["PJ Harvey","Björk","Alanis Morissette","Fiona Apple"],correct:1}
 ];
-let idx=0,score=0,uName="",uPhone="",tInt=null,tLeft=10;
+let idx=0,score=0,uName="",uPhone="",tInt=null,tLeft=15;
 document.getElementById("start-btn").onclick=function(){
 uName=document.getElementById("username").value.trim();uPhone=document.getElementById("userphone").value.trim();
 if(uName===""||uPhone===""){alert("Fields cannot be empty.");return}
@@ -63,13 +63,13 @@ document.getElementById("setup-screen").className="card hidden";document.getElem
 };
 document.getElementById("reload-btn").onclick=function(){location.reload()};
 function showQ(){
-clearInterval(tInt);tLeft=10;document.getElementById("timer-bar").style.width="100%";
+clearInterval(tInt);tLeft=15;document.getElementById("timer-bar").style.width="100%";
 const curr=quizData[idx];document.getElementById("question-text").innerText="Question "+(idx+1)+" of "+quizData.length+": "+curr.q;
 const box=document.getElementById("options-container");box.innerHTML="";
 curr.a.forEach(function(opt,i){
 const b=document.createElement("button");b.className="option-btn";b.innerText=opt;b.onclick=function(){nxt(i)};box.appendChild(b);
 });
-tInt=setInterval(function(){tLeft--;document.getElementById("timer-bar").style.width=((tLeft/10)*100)+"%";if(tLeft<=0){clearInterval(tInt);nxt(-1)}},1000);
+tInt=setInterval(function(){tLeft--;document.getElementById("timer-bar").style.width=((tLeft/15)*100)+"%";if(tLeft<=0){clearInterval(tInt);nxt(-1)}},1000);
 }
 function nxt(sel){clearInterval(tInt);if(sel===quizData[idx].correct){score++}idx++;if(idx<quizData.length){showQ()}else{send()}}
 function send(){
