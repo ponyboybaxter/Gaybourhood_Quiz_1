@@ -20,6 +20,7 @@
         ol { padding-left: 0; list-style: none; text-align: left; }
         li { padding: 12px; border-bottom: 1px solid #2d2d2d; display: flex; justify-content: space-between; align-items: center; }
         .rank { font-weight: bold; color: #ff007f; margin-right: 8px; }
+        #error-log { color: #ff3b30; background: rgba(255,59,48,0.1); padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 12px; text-align: left; display: none; border: 1px solid #ff3b30; }
     </style>
 </head>
 <body>
@@ -31,8 +32,9 @@
     <div class="card" id="setup-screen">
         <h2 style="margin-top:10px;">The Gaybourhood Quiz 🏆</h2>
         <input type="text" id="username" placeholder="Enter Your Name" required>
-        <input type="number" id="userphone" placeholder="Last 3 Digits of Phone" pattern="[0-9]{3}" required>
-        <button onclick="startQuiz()">Start Quiz</button>
+        <input type="number" id="userphone" placeholder="Last 3 Digits of Phone" required>
+        <button id="start-btn">Start Quiz</button>
+        <div id="error-log"></div>
     </div>
 
     <div class="card hidden" id="quiz-screen">
@@ -48,6 +50,16 @@
     </div>
 
     <script>
+        // Catch initialization errors immediately
+        window.onerror = function(msg, url, line) {
+            var log = document.getElementById('error-log');
+            if(log) {
+                log.style.display = 'block';
+                log.innerText = "Error: " + msg + " on line " + line;
+            }
+            return false;
+        };
+
         const SCRIPT_URL = "https://google.com";
 
         const quizData = [
@@ -80,19 +92,26 @@
         let timerInterval = null;
         let timeLeft = 10;
 
-        function startQuiz() {
-            userName = document.getElementById('username').value.trim();
-            userPhone = document.getElementById('userphone').value.trim();
+        // Use standard event listener structure to bypass mobile browser loading glitches
+        document.getElementById('start-btn').addEventListener('click', function() {
+            try {
+                userName = document.getElementById('username').value.trim();
+                userPhone = document.getElementById('userphone').value.trim();
 
-            if (userName === "" || userPhone.length !== 3) {
-                alert("Please enter your name and the last 3 digits of your phone number.");
-                return;
+                if (userName === "" || userPhone === "") {
+                    alert("Please fill out both entry boxes fields.");
+                    return;
+                }
+
+                document.getElementById('setup-screen').classList.add('hidden');
+                document.getElementById('quiz-screen').classList.remove('hidden');
+                loadQuestion();
+            } catch(e) {
+                var log = document.getElementById('error-log');
+                log.style.display = 'block';
+                log.innerText = "Execution Error: " + e.message;
             }
-
-            document.getElementById('setup-screen').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            loadQuestion();
-        }
+        });
 
         function loadQuestion() {
             clearInterval(timerInterval);
@@ -120,36 +139,3 @@
                     clearInterval(timerInterval);
                     handleAnswer(-1);
                 }
-            }, 1000);
-        }
-
-        function updateTimerBar() {
-            const percentage = (timeLeft / 10) * 100;
-            document.getElementById('timer-bar').style.width = percentage + "%";
-        }
-
-        function handleAnswer(selectedIndex) {
-            clearInterval(timerInterval);
-            
-            if (selectedIndex === quizData[currentQuestionIndex].correct) {
-                score++;
-            }
-
-            currentQuestionIndex++;
-            if (currentQuestionIndex < quizData.length) {
-                loadQuestion();
-            } else {
-                submitData();
-            }
-        }
-
-        function submitData() {
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('leaderboard-screen').classList.remove('hidden');
-
-            const payload = {
-                name: userName,
-                phone: userPhone,
-                score: score
-
-
