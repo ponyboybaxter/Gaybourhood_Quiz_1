@@ -32,7 +32,7 @@
         <h2 style="margin-top:10px;">The Gaybourhood Quiz 🏆</h2>
         <input type="text" id="username" placeholder="Enter Your Name">
         <input type="text" id="userphone" placeholder="Last 3 Digits of Phone">
-        <button class="action-btn" onclick="launchTheQuiz()">Start Quiz</button>
+        <button class="action-btn" id="start-quiz-trigger">Start Quiz</button>
     </div>
 
     <div id="quiz-screen" class="card hidden">
@@ -44,7 +44,7 @@
     <div id="leaderboard-screen" class="card hidden">
         <h2>Leaderboard 🏆</h2>
         <ol id="leaderboard-list">Loading standings...</ol>
-        <button class="action-btn" onclick="location.reload()">Play Again</button>
+        <button class="action-btn" id="reload-quiz-trigger">Play Again</button>
     </div>
 
     <script>
@@ -80,33 +80,38 @@
         let timerInterval = null;
         let timeLeft = 10;
 
-        function launchTheQuiz() {
-            userName = document.getElementById('username').value.trim();
-            userPhone = document.getElementById('userphone').value.trim();
+        // Secure binding structure bypassing inline HTML quote interactions
+        document.getElementById("start-quiz-trigger").onclick = function() {
+            userName = document.getElementById("username").value.trim();
+            userPhone = document.getElementById("userphone").value.trim();
 
             if (userName === "" || userPhone === "") {
                 alert("Please fill out all fields.");
                 return;
             }
 
-            document.getElementById('setup-screen').className = 'card hidden';
-            document.getElementById('quiz-screen').className = 'card';
+            document.getElementById("setup-screen").className = "card hidden";
+            document.getElementById("quiz-screen").className = "card";
             runNextQuestion();
-        }
+        };
+
+        document.getElementById("reload-quiz-trigger").onclick = function() {
+            location.reload();
+        };
 
         function runNextQuestion() {
             clearInterval(timerInterval);
             timeLeft = 10;
-            document.getElementById('timer-bar').style.width = "100%";
+            document.getElementById("timer-bar").style.width = "100%";
 
             const currentQuestion = quizData[currentQuestionIndex];
-            document.getElementById('question-text').innerText = "Question " + (currentQuestionIndex + 1) + " of " + quizData.length + ": " + currentQuestion.q;
+            document.getElementById("question-text").innerText = "Question " + (currentQuestionIndex + 1) + " of " + quizData.length + ": " + currentQuestion.q;
             
-            const container = document.getElementById('options-container');
+            const container = document.getElementById("options-container");
             container.innerHTML = "";
 
             currentQuestion.a.forEach(function(option, index) {
-                const btn = document.createElement('button');
+                const btn = document.createElement("button");
                 btn.className = "option-btn";
                 btn.innerText = option;
                 btn.onclick = function() { checkUserChoice(index); };
@@ -115,7 +120,7 @@
 
             timerInterval = setInterval(function() {
                 timeLeft--;
-                document.getElementById('timer-bar').style.width = ((timeLeft / 10) * 100) + "%";
+                document.getElementById("timer-bar").style.width = ((timeLeft / 10) * 100) + "%";
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     checkUserChoice(-1);
@@ -137,8 +142,3 @@
         }
 
         function uploadScoreData() {
-            document.getElementById('quiz-screen').className = 'card hidden';
-            document.getElementById('leaderboard-screen').className = 'card';
-            
-            fetch(SCRIPT_URL, {
-                method: "POST",
