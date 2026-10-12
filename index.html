@@ -23,33 +23,25 @@
     </style>
 </head>
 <body>
-
-    <div class="logo-container">
-        <img src="3A1E49B9-38B7-4887-AF88-45CC49875B8D.png" id="logo" alt="The Gaybourhood Logo">
-    </div>
-
+    <div class="logo-container"><img src="3A1E49B9-38B7-4887-AF88-45CC49875B8D.png" id="logo" alt="The Gaybourhood Logo"></div>
     <div id="setup-screen" class="card">
         <h2 style="margin-top:10px;">The Gaybourhood Quiz 🏆</h2>
         <input type="text" id="username" placeholder="Enter Your Name">
         <input type="text" id="userphone" placeholder="Last 3 Digits of Phone">
         <button class="action-btn" id="start-quiz-trigger">Start Quiz</button>
     </div>
-
     <div id="quiz-screen" class="card hidden">
         <div class="timer-container"><div class="timer-bar" id="timer-bar"></div></div>
         <h3 id="question-text" style="margin-bottom:20px;">Loading Question...</h3>
         <div id="options-container"></div>
     </div>
-
     <div id="leaderboard-screen" class="card hidden">
         <h2>Leaderboard 🏆</h2>
         <ol id="leaderboard-list">Loading standings...</ol>
         <button class="action-btn" id="reload-quiz-trigger">Play Again</button>
     </div>
-
     <script>
         const SCRIPT_URL = "https://google.com";
-
         const quizData = [
             { q: "Which artist released the 1994 album ‘Dummy’?", a: ["Portishead", "Massive Attack", "Tricky", "Morcheeba"], correct: 0 },
             { q: "Which was David Bowie’s final studio album released during his lifetime?", a: ["The Next Day", "Blackstar", "Heathen", "Reality"], correct: 1 },
@@ -72,73 +64,22 @@
             { q: "Which artist released the album The Idler Wheel…, featuring the track ‘Every Single Night’, in 2012?", a: ["Tori Amos", "Regina Spektor", "Fiona Apple", "Cat Power"], correct: 2 },
             { q: "Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?", a: ["PJ Harvey", "Björk", "Alanis Morissette", "Fiona Apple"], correct: 1 }
         ];
-
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let userName = "";
-        let userPhone = "";
-        let timerInterval = null;
-        let timeLeft = 10;
-
-        // Secure binding structure bypassing inline HTML quote interactions
+        let currentQuestionIndex = 0, score = 0, userName = "", userPhone = "", timerInterval = null, timeLeft = 10;
         document.getElementById("start-quiz-trigger").onclick = function() {
-            userName = document.getElementById("username").value.trim();
-            userPhone = document.getElementById("userphone").value.trim();
-
-            if (userName === "" || userPhone === "") {
-                alert("Please fill out all fields.");
-                return;
-            }
-
-            document.getElementById("setup-screen").className = "card hidden";
-            document.getElementById("quiz-screen").className = "card";
-            runNextQuestion();
+            userName = document.getElementById("username").value.trim(); userPhone = document.getElementById("userphone").value.trim();
+            if (userName === "" || userPhone === "") { alert("Please fill out all fields."); return; }
+            document.getElementById("setup-screen").className = "card hidden"; document.getElementById("quiz-screen").className = "card"; runNextQuestion();
         };
-
-        document.getElementById("reload-quiz-trigger").onclick = function() {
-            location.reload();
-        };
-
+        document.getElementById("reload-quiz-trigger").onclick = function() { location.reload(); };
         function runNextQuestion() {
-            clearInterval(timerInterval);
-            timeLeft = 10;
-            document.getElementById("timer-bar").style.width = "100%";
-
-            const currentQuestion = quizData[currentQuestionIndex];
-            document.getElementById("question-text").innerText = "Question " + (currentQuestionIndex + 1) + " of " + quizData.length + ": " + currentQuestion.q;
-            
-            const container = document.getElementById("options-container");
-            container.innerHTML = "";
-
+            clearInterval(timerInterval); timeLeft = 10; document.getElementById("timer-bar").style.width = "100%";
+            const currentQuestion = quizData[currentQuestionIndex]; document.getElementById("question-text").innerText = "Question " + (currentQuestionIndex + 1) + " of " + quizData.length + ": " + currentQuestion.q;
+            const container = document.getElementById("options-container"); container.innerHTML = "";
             currentQuestion.a.forEach(function(option, index) {
-                const btn = document.createElement("button");
-                btn.className = "option-btn";
-                btn.innerText = option;
-                btn.onclick = function() { checkUserChoice(index); };
-                container.appendChild(btn);
+                const btn = document.createElement("button"); btn.className = "option-btn"; btn.innerText = option; btn.onclick = function() { checkUserChoice(index); }; container.appendChild(btn);
             });
-
-            timerInterval = setInterval(function() {
-                timeLeft--;
-                document.getElementById("timer-bar").style.width = ((timeLeft / 10) * 100) + "%";
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    checkUserChoice(-1);
-                }
-            }, 1000);
+            timerInterval = setInterval(function() { timeLeft--; document.getElementById("timer-bar").style.width = ((timeLeft / 10) * 100) + "%"; if (timeLeft <= 0) { clearInterval(timerInterval); checkUserChoice(-1); } }, 1000);
         }
+        function checkUserChoice(selectedIndex) { clearInterval(timerInterval); if (selectedIndex === quizData[currentQuestionIndex].correct) { score++; } currentQuestionIndex++; if (currentQuestionIndex < quizData.length) { runNextQuestion(); } else { uploadScoreData(); } }
+        function uploadScoreData() { document.getElementById("quiz-screen").className = "card hidden"; document.getElementById("leaderboard-screen").className = "card"; fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: userName, phone: userPhone, score: score }) }).then(function() { setTimeout(downloadLeaderboard, 1500); }).catch(function(err) { downloadLeaderboard(); }); }
 
-        function checkUserChoice(selectedIndex) {
-            clearInterval(timerInterval);
-            if (selectedIndex === quizData[currentQuestionIndex].correct) {
-                score++;
-            }
-            currentQuestionIndex++;
-            if (currentQuestionIndex < quizData.length) {
-                runNextQuestion();
-            } else {
-                uploadScoreData();
-            }
-        }
-
-        function uploadScoreData() {
