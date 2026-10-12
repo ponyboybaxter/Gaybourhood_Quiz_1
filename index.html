@@ -12,8 +12,8 @@
         .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #ff007f, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #7f00ff); }
         .hidden { display: none !important; }
         input { width: 100%; padding: 14px; margin: 12px 0; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #2a2a2a; color: white; }
-        button { background: linear-gradient(135deg, #ff007f, #7f00ff); color: white; border: none; padding: 14px 20px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 12px; }
-        .option-btn { background: #2a2a2a; color: #fff; text-align: left; margin: 10px 0; border: 1px solid #3c3c3c; width: 100%; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; }
+        .action-btn { display: block; background: linear-gradient(135deg, #ff007f, #7f00ff); color: white; text-decoration: none; padding: 14px 20px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 12px; text-align: center; border: none; width: 100%; box-sizing: border-box; }
+        .option-btn { background: #2a2a2a; color: #fff; text-align: left; margin: 10px 0; border: 1px solid #3c3c3c; width: 100%; padding: 14px; font-size: 16px; border-radius: 8px; cursor: pointer; display: block; box-sizing: border-box; }
         .option-btn:hover { background: #3a3a3a; border-color: #ff007f; }
         .timer-container { width: 100%; background-color: #333; height: 6px; border-radius: 3px; margin: 15px 0; overflow: hidden; }
         .timer-bar { height: 100%; background: #ff007f; width: 100%; transition: width 1s linear; }
@@ -32,8 +32,7 @@
         <h2 style="margin-top:10px;">The Gaybourhood Quiz 🏆</h2>
         <input type="text" id="username" placeholder="Enter Your Name">
         <input type="text" id="userphone" placeholder="Last 3 Digits of Phone">
-        <!-- SIMPLIFIED RUN MECHANIC -->
-        <button type="button" id="start-btn" onclick="javascript:launchTheQuiz();">Start Quiz</button>
+        <button class="action-btn" onclick="launchTheQuiz()">Start Quiz</button>
     </div>
 
     <div id="quiz-screen" class="card hidden">
@@ -45,7 +44,7 @@
     <div id="leaderboard-screen" class="card hidden">
         <h2>Leaderboard 🏆</h2>
         <ol id="leaderboard-list">Loading standings...</ol>
-        <button type="button" onclick="javascript:location.reload();">Play Again</button>
+        <button class="action-btn" onclick="location.reload()">Play Again</button>
     </div>
 
     <script>
@@ -57,7 +56,7 @@
             { q: "Which band released the album Mezzanine?", a: ["Portishead", "UNKLE", "Massive Attack", "Faithless"], correct: 2 },
             { q: "Who originally recorded ‘Tainted Love’ before Soft Cell made it a huge hit?", a: ["Sandie Shaw", "Gloria Jones", "Dusty Springfield", "P.P. Arnold"], correct: 1 },
             { q: "Which Fleetwood Mac album features the song ‘The Chain’?", a: ["Rumours", "Tusk", "Fleetwood Mac (1975)", "Mirage"], correct: 0 },
-            { q: "Who sang the original version of ‘Nothing Compares 2 U’, written by Prince?", a: ["Sinéad O’Connor", "The Family", "Wendy & Lisa", "Chaka Khan"], correct: 1 },
+            { q: "Who sang the original version of ‘Nothing Comares 2 U’, written by Prince?", a: ["Sinéad O’Connor", "The Family", "Wendy & Lisa", "Chaka Khan"], correct: 1 },
             { q: "What was the first studio album released by The Cure?", a: ["Seventeen Seconds", "Faith", "Three Imaginary Boys", "Boys Don’t Cry"], correct: 2 },
             { q: "Which singer performed ’Unfinished Symphony’ with Massive Attack?", a: ["Neneh Cherry", "Shara Nelson", "Tracey Thorn", "Carleen Anderson"], correct: 1 },
             { q: "Which Beatles album was released first?", a: ["Rubber Soul", "Revolver", "Help!", "Sgt. Pepper’s Lonely Hearts Club Band"], correct: 2 },
@@ -82,10 +81,10 @@
         let timeLeft = 10;
 
         function launchTheQuiz() {
-            userName = document.getElementById('username').value;
-            userPhone = document.getElementById('userphone').value;
+            userName = document.getElementById('username').value.trim();
+            userPhone = document.getElementById('userphone').value.trim();
 
-            if (!userName || !userPhone) {
+            if (userName === "" || userPhone === "") {
                 alert("Please fill out all fields.");
                 return;
             }
@@ -143,5 +142,3 @@
             
             fetch(SCRIPT_URL, {
                 method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
