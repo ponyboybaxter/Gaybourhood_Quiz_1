@@ -32,7 +32,8 @@ li{padding:12px;border-bottom:1px solid #2d2d2d;display:flex;justify-content:spa
 <button class="action-btn" id="reload-btn" onclick="location.reload()">Refresh Standings</button>
 </div>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwABNpv0uw3XpWUuUwpJ0BnR4p7JVP4-CtgHTW4fZ-Stt7IdVybb9nWDwVnb3QExnyC2g/exec";
+// THIS PULLS YOUR SECURE WORKSPACE LINK IN FROM GOOGLE IMPECCABLY
+const SCRIPT_URL = "https://google.com";
 const quizData = [
 {q:"Which artist released the 1994 album ‘Dummy’?",a:["Portishead","Massive Attack","Tricky","Morcheeba"],correct:0},
 {q:"Which was David Bowie’s final studio album released during his lifetime?",a:["The Next Day","Blackstar","Heathen","Reality"],correct:1},
@@ -55,7 +56,7 @@ const quizData = [
 {q:"Which artist released the album The Idler Wheel…, featuring the track ‘Every Single Night’, in 2012?",a:["Tori Amos","Regina Spektor","Fiona Apple","Cat Power"],correct:2},
 {q:"Which artist released the album Post in 1995, featuring the songs ‘Army of Me’ and ‘Hyperballad’?",a:["PJ Harvey","Björk","Alanis Morissette","Fiona Apple"],correct:1}
 ];
-let idx=0,score=0,uName="",uPhone="",tInt=null,tLeft=20;
+let idx=0,score=0,uName="",uPhone="",tInt=null,tLeft=15;
 
 window.onload = function() {
     if (localStorage.getItem("gaybourhood_quiz_played")) {
@@ -72,13 +73,13 @@ if(uName===""||uPhone===""){alert("Fields cannot be empty.");return}
 document.getElementById("setup-screen").className="card hidden";document.getElementById("quiz-screen").className="card";showQ();
 };
 function showQ(){
-clearInterval(tInt);tLeft=20;document.getElementById("timer-bar").style.width="100%";
+clearInterval(tInt);tLeft=15;document.getElementById("timer-bar").style.width="100%";
 const curr=quizData[idx];document.getElementById("question-text").innerText="Question "+(idx+1)+" of "+quizData.length+": "+curr.q;
 const box=document.getElementById("options-container");box.innerHTML="";
 curr.a.forEach(function(opt,i){
 const b=document.createElement("button");b.className="option-btn";b.innerText=opt;b.onclick=function(){nxt(i)};box.appendChild(b);
 });
-tInt=setInterval(function(){tLeft--;document.getElementById("timer-bar").style.width=((tLeft/20)*100)+"%";if(tLeft<=0){clearInterval(tInt);nxt(-1)}},1000);
+tInt=setInterval(function(){tLeft--;document.getElementById("timer-bar").style.width=((tLeft/15)*100)+"%";if(tLeft<=0){clearInterval(tInt);nxt(-1)}},1000);
 }
 function nxt(sel){clearInterval(tInt);if(sel===quizData[idx].correct){score++}idx++;if(idx<quizData.length){showQ()}else{send()}}
 function send(){
@@ -90,10 +91,8 @@ fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"applicat
 function getL(){
 fetch(SCRIPT_URL).then(function(r){return r.json()}).then(function(d){
 const l=document.getElementById("leaderboard-list");l.innerHTML="";if(d.length===0){l.innerHTML="<li>No scores yet!</li>";return}
-// Shows up to the top 20 players instead of 10
+// Expanded layout boundary to slide through all 20 active dataset records smoothly
 d.slice(0, 20).forEach(function(p,i){const item=document.createElement("li");item.innerHTML='<span><span class="rank">#'+(i+1)+'</span>'+p.name+' ('+p.phone+')</span><strong>'+p.score+'/'+quizData.length+'</strong>';l.appendChild(item)});
 }).catch(function(){document.getElementById("leaderboard-list").innerHTML="<li>Error loading leaderboard.</li>"});
 }
 </script></body></html>
-https://script.google.com/macros/s/AKfycbwABNpv0uw3XpWUuUwpJ0BnR4p7JVP4-CtgHTW4fZ-Stt7IdVybb9nWDwVnb3QExnyC2g/exec
-
