@@ -32,7 +32,7 @@ li{padding:12px;border-bottom:1px solid #2d2d2d;display:flex;justify-content:spa
 <button class="action-btn" id="reload-btn" onclick="location.reload()">Refresh Standings</button>
 </div>
 <script>
-const SCRIPT_URL = "https://google.com";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwABNpv0uw3XpWUuUwpJ0BnR4p7JVP4-CtgHTW4fZ-Stt7IdVybb9nWDwVnb3QExnyC2g/exec";
 const quizData = [
 {q:"Which artist released the 1994 album ‘Dummy’?",a:["Portishead","Massive Attack","Tricky","Morcheeba"],correct:0},
 {q:"Which was David Bowie’s final studio album released during his lifetime?",a:["The Next Day","Blackstar","Heathen","Reality"],correct:1},
@@ -94,3 +94,4 @@ d.forEach(function(p,i){const item=document.createElement("li");item.innerHTML='
 }).catch(function(){document.getElementById("leaderboard-list").innerHTML="<li>Error loading leaderboard.</li>"});
 }
 </script></body></html>
+
